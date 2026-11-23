@@ -1,0 +1,65 @@
+name: Verify learning pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Create disposable database credentials
+        run: |
+          python3 - <<'PY'
+          import secrets
+          from pathlib import Path
+
+          values = {
+              "MYSQL_PASSWORD": secrets.token_urlsafe(24),
+              "MYSQL_ROOT_PASSWORD": secrets.token_urlsafe(24),
+              "POSTGRES_PASSWORD": secrets.token_urlsafe(24),
+          }
+          path = Path(".env")
+          path.write_text("".join(f"{key}={value}\n" for key, value in values.items()))
+          path.chmod(0o600)
+          PY
+
+      - name: Build from empty databases
+        run: |
+          docker compose run --build --rm runner sh scripts/run_demo.sh
+          docker compose run --rm runner python -m src.assert_demo --expected-events 100 --expected-late 0 --expected-first-seen-corrections 0
+
+      - name: Verify idempotent replay
+        run: |
+          docker compose run --rm runner sh scripts/run_demo.sh
+          docker compose run --rm runner python -m src.assert_demo --expected-events 100 --expected-late 0 --expected-first-seen-corrections 0
+
+      - name: Verify late event processing
+        run: |
+          docker compose run --rm runner sh -c '
+            python src/generate_events.py --seed 43 --count 10 --output data/late-events.jsonl &&
+            python src/load_source.py data/late-events.jsonl &&
+            python src/sync_warehouse.py --batch-size 4 &&
+            python src/build_mart.py --batch-size 4 &&
+            python src/check_pipeline.py &&
+            python src/check_mart.py'
+          docker compose run --rm runner python -m src.assert_demo --expected-events 110 --expected-late 10 --expected-first-seen-corrections 1
+
+      - name: Verify rollback and sample queries
+        run: |
+          docker compose run --rm runner python -m scripts.verify_recovery
+          docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U pipeline -d learning -f /app/05_example_queries.sql
+
+      - name: Remove disposable databases
+        if: always()
+        run: docker compose down -v

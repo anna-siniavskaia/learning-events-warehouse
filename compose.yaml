@@ -1,0 +1,56 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: learning
+      MYSQL_USER: pipeline
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+      TZ: UTC
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/01_mysql_source.sql:/docker-entrypoint-initdb.d/01_source.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_PASSWORD\" mysql -h 127.0.0.1 -u pipeline learning -e 'SELECT 1 FROM learning_events LIMIT 0' >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: learning
+      POSTGRES_USER: pipeline
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      TZ: UTC
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/02_postgres_warehouse.sql:/docker-entrypoint-initdb.d/02_warehouse.sql:ro
+      - ./sql/03_mart_schema.sql:/docker-entrypoint-initdb.d/03_mart.sql:ro
+      - ./sql/04_analytics.sql:/docker-entrypoint-initdb.d/04_analytics.sql:ro
+      - ./sql/05_example_queries.sql:/app/05_example_queries.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pipeline -d learning"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  runner:
+    build: .
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: pipeline
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in .env}
+      MYSQL_DATABASE: learning
+      POSTGRES_DSN: postgresql://pipeline:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/learning
+    volumes:
+      - ./data:/app/data
+
+volumes:
+  mysql_data:
+  postgres_data:

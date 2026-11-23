@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/learning-event.schema.json",
+  "title": "Synthetic learning event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_id", "learner_id", "event_type", "content_id", "occurred_at", "recorded_at", "payload"],
+  "properties": {
+    "event_id": {"type": "string", "format": "uuid"},
+    "learner_id": {"type": "string", "pattern": "^learner-[0-9]{4}$"},
+    "event_type": {"enum": ["exercise_completed", "text_read", "placement_completed"]},
+    "content_id": {"type": "string", "pattern": "^(exercise|text|placement)-[0-9]{3}$"},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "payload": {"type": "object"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"event_type": {"const": "text_read"}}},
+      "then": {"properties": {"content_id": {"pattern": "^text-[0-9]{3}$"}, "payload": {"type": "object", "required": ["duration_seconds", "level"], "additionalProperties": false, "properties": {"duration_seconds": {"type": "integer", "minimum": 1}, "level": {"enum": ["A1", "A2", "B1", "B2"]}}}}}
+    },
+    {
+      "if": {"properties": {"event_type": {"enum": ["exercise_completed", "placement_completed"]}}},
+      "then": {"properties": {"payload": {"type": "object", "required": ["score", "level"], "additionalProperties": false, "properties": {"score": {"type": "integer", "minimum": 0, "maximum": 100}, "level": {"enum": ["A1", "A2", "B1", "B2"]}}}}}
+    },
+    {
+      "if": {"properties": {"event_type": {"const": "exercise_completed"}}},
+      "then": {"properties": {"content_id": {"pattern": "^exercise-[0-9]{3}$"}}}
+    },
+    {
+      "if": {"properties": {"event_type": {"const": "placement_completed"}}},
+      "then": {"properties": {"content_id": {"pattern": "^placement-[0-9]{3}$"}}}
+    }
+  ]
+}
