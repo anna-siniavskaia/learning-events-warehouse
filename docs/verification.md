@@ -34,6 +34,8 @@ On 21 November, the integration assertion was tightened to compare all seven row
 
 On 22 November, the same exact reconciliation was extended to every `(event_date, level)` row in `mart.level_activity`. Fixtures now pin event counts, distinct active learners, exercise-score averages, and `NULL` score semantics for both the 100-event and 110-event states. Two additional tests verify the complete result and reject a changed level metric without relying on row counts.
 
+On 23 November, the reviewed 34-file snapshot was published to the private `anna-siniavskaia/learning-events-warehouse` repository. GitHub confirmed `main`, the README, and `.github/workflows/verify.yml`; hosted CI remains pending until the first workflow run completes.
+
 ## Tracked-file review, 19 November 2026
 
 `git ls-files` returned **32** source, SQL, contract, workflow, test, and documentation files. The local `.env` and generated JSONL data were not tracked; `.env.example` contained only three explicit `replace-with-...` placeholders. A tracked-file scan found no API key, access token, or private-key marker, and no project file outside generated data exceeded **1 MiB**. The worktree was clean before this verification record was added.

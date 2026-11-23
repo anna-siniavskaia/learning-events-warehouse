@@ -21,7 +21,7 @@ See [verification.md](verification.md) for commands, fixture counts, and limitat
 
 - [ ] Run `python3 scripts/bootstrap.py` once in an unrestricted local terminal and record the result.
 - [x] Review `git status` and the complete tracked-file list for credentials, generated data, and large files.
-- [ ] Create the GitHub repository as private and push `main` on the planned release date.
+- [x] Create the GitHub repository as private and publish the reviewed `main` snapshot.
 
 ## After the first push
 
