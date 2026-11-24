@@ -12,6 +12,7 @@ Use this checklist for the first private GitHub release. Record evidence instead
 - [x] The recovery demonstration preserved both watermarks when a mart refresh failed.
 - [x] Mart quality checks detect missing, extra, or changed learner and content dimension members.
 - [x] Exact daily and CEFR-level metric fixtures cover the initial and late-event states across all seven event dates.
+- [x] A machine-readable health report exposes counts, watermarks, and ingestion/mart lag and fails on divergence.
 - [x] Contract validation rejects invalid scores, durations, and event/content ID combinations.
 - [x] The full Docker replay passed 22 tests on 20 November 2026.
 

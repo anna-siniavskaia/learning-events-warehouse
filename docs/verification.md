@@ -36,6 +36,10 @@ On 22 November, the same exact reconciliation was extended to every `(event_date
 
 On 23 November, the reviewed 34-file snapshot was published to the private `anna-siniavskaia/learning-events-warehouse` repository. GitHub confirmed `main`, the README, and `.github/workflows/verify.yml`; hosted CI remains pending until the first workflow run completes.
 
+## Operational health snapshot, 24 November 2026
+
+`src/health_report.py` now emits one JSON object with source, raw, and fact counts; source and warehouse maxima; ingestion and mart watermarks; and both lag values. A healthy 110-event late-arrival state reports zero lag. Unit coverage also verifies a degraded state with pending ingestion and mart rows, plus an explicit failure for a missing watermark. The command is part of `scripts/run_demo.sh`, so the same assertion runs in local demos and hosted CI.
+
 ## Tracked-file review, 19 November 2026
 
 `git ls-files` returned **32** source, SQL, contract, workflow, test, and documentation files. The local `.env` and generated JSONL data were not tracked; `.env.example` contained only three explicit `replace-with-...` placeholders. A tracked-file scan found no API key, access token, or private-key marker, and no project file outside generated data exceeded **1 MiB**. The worktree was clean before this verification record was added.
