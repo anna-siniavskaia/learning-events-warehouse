@@ -56,6 +56,14 @@ docker compose run --rm runner python -m scripts.verify_recovery
 
 The recovery check inserts a temporary raw event with an invalid score, confirms that the mart fact, new dimensions, and watermark all roll back, then removes that event. It leaves the valid rows in place.
 
+Emit a JSON health snapshot suitable for a scheduler or monitoring check:
+
+```bash
+docker compose run --rm runner python src/health_report.py
+```
+
+The report includes source, raw, and fact counts; both watermarks; and ingestion and mart lag. It exits non-zero when those states diverge.
+
 The MySQL `datetime(6)` values represent UTC without an offset. The loader converts timestamp strings to UTC before insertion. The warehouse transaction locks its watermark row, inserts or verifies each source row, then advances the watermark. A conflicting event aborts the transaction. This prevents a successful watermark update for a failed batch.
 
 See [architecture and recovery](docs/architecture.md), [metric definitions](docs/metrics.md), [reproducible sample results](docs/sample-results.md), [integration verification](docs/verification.md), and the [private release checklist](docs/release-checklist.md) for the data flow, retry behavior, observed checks, and remaining publication gates.
