@@ -26,6 +26,6 @@ See [verification.md](verification.md) for commands, fixture counts, and limitat
 
 ## After the first push
 
-- [ ] Confirm the GitHub Actions workflow passes from empty database volumes.
+- [x] Confirm the GitHub Actions workflow passes from empty database volumes.
 - [ ] Open the README links and verify that the architecture, metrics, verification, and checklist pages render.
 - [ ] Keep the repository private until Anna makes a separate visibility decision.

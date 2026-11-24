@@ -22,7 +22,7 @@ The loader advances a PostgreSQL watermark using the MySQL `source_id`, not the 
 - [x] Verify fresh builds, replays, and late events end to end.
 - [x] Verify failure rollback and recovery on a disposable invalid event.
 - [x] Publish the reviewed first complete version in a private GitHub repository.
-- [ ] Confirm the hosted GitHub Actions run from empty database volumes.
+- [x] Confirm the hosted GitHub Actions run from empty database volumes.
 
 Generate 100 local events:
 
@@ -70,4 +70,4 @@ See [architecture and recovery](docs/architecture.md), [metric definitions](docs
 
 ## Automated verification
 
-The [GitHub Actions workflow](.github/workflows/verify.yml) runs on pushes and pull requests. It builds empty databases, checks an identical replay, loads ten late events, asserts every daily and CEFR-level metric before and after that batch, tests rollback, and executes the sample queries. The private repository was created on 23 November 2026; hosted verification is the remaining release gate.
+The [GitHub Actions workflow](.github/workflows/verify.yml) runs on pushes and pull requests. It builds empty databases, checks an identical replay, loads ten late events, asserts every daily and CEFR-level metric before and after that batch, tests rollback, and executes the sample queries. The private repository was created on 23 November 2026, and the complete hosted workflow passed on 24 November.
