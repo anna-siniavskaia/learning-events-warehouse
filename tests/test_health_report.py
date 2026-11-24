@@ -1,4 +1,5 @@
 import unittest
+from decimal import Decimal
 from unittest.mock import MagicMock
 
 from src.health_report import collect_health
@@ -14,7 +15,7 @@ class HealthReportTests(unittest.TestCase):
 
     def test_healthy_snapshot_has_zero_lag(self):
         mysql, postgres = self.connections(
-            (110, 110),
+            (110, Decimal("110")),
             [(110, 110), (110, 110), (110,), (110,)],
         )
         report = collect_health(mysql, postgres)

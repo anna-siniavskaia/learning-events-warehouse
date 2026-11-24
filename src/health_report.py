@@ -30,8 +30,14 @@ def collect_health(mysql_connection, pg_connection) -> dict[str, int | str | boo
     if ingestion_state is None or mart_state is None:
         raise RuntimeError("pipeline or mart watermark is missing")
 
-    ingestion_watermark = ingestion_state[0]
-    mart_watermark = mart_state[0]
+    source_count = int(source_count)
+    source_max_id = int(source_max_id)
+    raw_count = int(raw_count)
+    raw_max_id = int(raw_max_id)
+    fact_count = int(fact_count)
+    fact_max_id = int(fact_max_id)
+    ingestion_watermark = int(ingestion_state[0])
+    mart_watermark = int(mart_state[0])
     healthy = (
         source_count == raw_count == fact_count
         and source_max_id == raw_max_id == fact_max_id
